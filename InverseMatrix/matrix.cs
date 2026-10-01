@@ -174,26 +174,27 @@ namespace InverseMatrix
             //소행렬식을 통한 여인수 구하기
             static double Cofactor(double[,] minor, int row, int col)
             {
-                double det = 0;
-                switch (minor.GetLength(0))
-                {
-                    //소행렬이 없을때
-                    case 0:
-                        det = 1;
-                        break;
-                    //소행렬이 1 x 1 행렬일떄
-                    case 1:
-                        det = minor[0, 0];
-                        break;
-                    //소행렬이 2 x 2 행렬일떄
-                    case 2:
-                        det = (minor[0, 0] * minor[1, 1]) - (minor[0, 1] * minor[1, 0]);
-                        break;
-                    //소행렬이 3 x 3 행렬일때
-                    case 3:
-                        det = ((minor[0, 0] * minor[1, 1] * minor[2, 2]) + (minor[0, 1] * minor[1, 2] * minor[2, 0]) + (minor[0, 2] * minor[2, 1] * minor[1, 0])) - ((minor[0, 2] * minor[1, 1] * minor[2, 0]) + (minor[1, 2] * minor[2, 1] * minor[0, 0]) + (minor[2, 2] * minor[1, 0] * minor[0, 1]));
-                        break;
-                }
+                double det = DeterminantRecursive(minor);
+                //switch (minor.GetLength(0))
+                //{
+                //    //소행렬이 없을때
+                //    case 0:
+                //        det = 1;
+                //        break;
+                //    //소행렬이 1 x 1 행렬일떄
+                //    case 1:
+                //        det = minor[0, 0];
+                //        break;
+                //    //소행렬이 2 x 2 행렬일떄
+                //    case 2:
+                //        det = (minor[0, 0] * minor[1, 1]) - (minor[0, 1] * minor[1, 0]);
+                //        break;
+                //    //소행렬이 3 x 3 행렬일때
+                //    case 3:
+                //        det = ((minor[0, 0] * minor[1, 1] * minor[2, 2]) + (minor[0, 1] * minor[1, 2] * minor[2, 0]) + (minor[0, 2] * minor[2, 1] * minor[1, 0])) - ((minor[0, 2] * minor[1, 1] * minor[2, 0]) + (minor[1, 2] * minor[2, 1] * minor[0, 0]) + (minor[2, 2] * minor[1, 0] * minor[0, 1]));
+                //        break;
+                //}
+
                 double cofactor = (double)Math.Pow(-1, row + col) * det;
                 return cofactor;
             }
@@ -240,6 +241,36 @@ namespace InverseMatrix
                     throw new Exception($"det의 값이 0입니다. 현재 det : {det}");
                 }
                 return det;
+            }
+
+            //행렬의 크기에 상관없이 재귀적으로 행렬식 반환
+            static double DeterminantRecursive(double[,] mat)
+            {
+                int matSize = mat.GetLength(0);
+                if (matSize == 0)
+                {
+                    return 1;
+                }
+                else if (matSize == 1)
+                {
+                    return mat[0, 0];
+                }
+                else if (matSize == 2)
+                {
+                    return (mat[0, 0] * mat[1, 1]) - (mat[0, 1] * mat[1, 0]);
+                }
+
+                double det = 0;
+                //3x3 이상의 행렬은 소행렬을 생성하여 재귀적으로 행렬식을 계산한다.
+                for (int i = 0; i < matSize; i++)
+                {
+                    double[,] minor = MinorMatrix(0, i, mat);
+                    double cofactor = Math.Pow(-1, i) * DeterminantRecursive(minor);
+                    det += cofactor * mat[0, i];
+                }
+
+                return det;
+
             }
 
             //가우소-조던 소거법을 이용해 역행렬 구하는 함수
