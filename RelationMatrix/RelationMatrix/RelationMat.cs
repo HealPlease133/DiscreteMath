@@ -10,16 +10,60 @@ namespace RelationMatrix
     {
         public static void Main(string[] args)
         {
+            Console.WriteLine("5x5 관계 행렬을 입력하세요. (0 또는 1)");
             //초기 행렬 생성
             int[,] initMat = new int[5,5];
             bool isEqu = false;
             //입력값 받아오기
             for(int i = 0; i < 5; i++)
             {
-                string[] rows = Console.ReadLine().Split();
-                for(int j = 0; j < 5; j++)
+                while (true)
                 {
-                    initMat[i,j] = int.Parse(rows[j]);
+                    Console.Write($"{i + 1}번째 행 입력:");
+                    string input = Console.ReadLine();
+                    //빈 입력 검사
+                    if (string.IsNullOrWhiteSpace(input))
+                    {
+                        Console.WriteLine("입력값이 비어 있습니다. 다시 입력하세요.");
+                        continue;
+                    }
+                    string[] rows = input.Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
+                    //입력 개수 확인
+                    if(rows.Length != 5)
+                    {
+                        Console.WriteLine("숫자 5개를 입력해야 합니다. 다시 입력하세요.");
+                        continue;
+                    }
+                    int[] temp = new int[5];
+                    bool pass = true;
+                    for (int j = 0; j < 5; j++)
+                    {
+                        //숫자가 아닌 값이 들어왔는지 확인
+                        if (!int.TryParse(rows[j], out temp[j]))
+                        {
+                            Console.WriteLine("숫자가 아닌 값이 포함되어 있습니다. 다시 입력하세요.");
+                            pass = false;
+                            break;
+                        }
+                        //0또는 1인지 확인
+                        if (temp[j] != 0 && temp[j] != 1)
+                        {
+                            Console.WriteLine("0또는 1만 입력할 수 있습니다. 다시 입력하세요.");
+                            pass = false;
+                            break;
+                        }
+                    }
+                    if (!pass)
+                    {
+                        continue;
+                    }
+
+                    for (int j = 0; j < 5; j++)
+                    {
+                        initMat[i,j] = temp[j];
+                    }
+
+                    break;
                 }
             }
             //초기 관계행렬의 성질 출력
@@ -239,7 +283,7 @@ namespace RelationMatrix
                 mat[i, i] = 1;
             }
             return mat;
-        }
+        } 
         //대칭폐포 생성
         static int[,] getSymmetricClosure(int[,] mat)
         {
